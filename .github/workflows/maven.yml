@@ -55,9 +55,7 @@ jobs:
         run: ${{ env.JAVA_HOME }}\bin\gu.cmd install native-image
 
       - name: Display infos
-        run: |
-          chmod +x mvnw
-          mvnw -v
+        run: mvnw -v
           
       - name: Native Image
         run: |
