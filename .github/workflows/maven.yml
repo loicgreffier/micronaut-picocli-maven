@@ -20,6 +20,9 @@ jobs:
       - name: Install Native Image
         run: gu install native-image
  
+      - name: Display
+        run: ls -la
+        
       - name: Build and analyze
         run: mvnw clean package -DskipTests -Dpackaging=native-image
         
