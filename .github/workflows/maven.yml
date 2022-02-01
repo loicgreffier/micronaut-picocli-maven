@@ -1,26 +1,61 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
-
-name: Java CI with Maven
-
+name: Build
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
-  build:
-
+  build-linux:
     runs-on: ubuntu-latest
-
+    environment: Build
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 11
-      uses: actions/setup-java@v2
-      with:
-        java-version: '11'
-        distribution: 'temurin'
-        cache: maven
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      
+      - uses: DeLaGuardo/setup-graalvm@4.0
+        with:
+          graalvm: '21.0.0.2'
+          java: 'java11'
+          
+      - name: Install Native Image
+        run: gu install native-image
+ 
+      - name: Build and analyze
+        run: mvnw clean package -DskipTests -Dpackaging=native-image
+        
+      - uses: actions/upload-artifact@v2
+        with:
+          name: native-image-linux
+          path: ${{ github.workspace }}/target/demo
+          
+      - uses: actions/upload-artifact@v2
+        with:
+          name: jar
+          path: ${{ github.workspace }}/target/demo-*.jar
+          
+  build-windows:
+    runs-on: windows-latest
+    environment: Build
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      
+      - uses: DeLaGuardo/setup-graalvm@4.0
+        with:
+          graalvm: '20.3.2'
+          java: 'java11'
+      
+      - name: Install Native Image
+        run: ${{ env.JAVA_HOME }}\bin\gu.cmd install native-image
+
+      - name: Native Image for CLI
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x86_amd64
+          mvnw.bat clean package -DskipTests -Dpackaging=native-image
+        shell: cmd
+      
+      - uses: actions/upload-artifact@v2
+        with:
+          name: native-image-windows
+          path: ${{ github.workspace }}/target/demo.exe
