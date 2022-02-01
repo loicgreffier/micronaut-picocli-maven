@@ -19,12 +19,11 @@ jobs:
           
       - name: Install Native Image
         run: gu install native-image
- 
-      - name: Display
-        run: ls -la
-        
+         
       - name: Build and analyze
-        run: ./mvnw clean package -DskipTests -Dpackaging=native-image
+        run: |
+          chmod +x mvnw
+          ./mvnw clean package -DskipTests -Dpackaging=native-image
         
       - uses: actions/upload-artifact@v2
         with:
