@@ -20,10 +20,13 @@ jobs:
       - name: Install Native Image
         run: gu install native-image
          
-      - name: Build and analyze
+      - name: Display infos
         run: |
           chmod +x mvnw
-          ./mvnw clean package -DskipTests -Dpackaging=native-image
+          mvnw -v
+         
+      - name: Build and analyze
+        run: ./mvnw clean package -DskipTests -Dpackaging=native-image
         
       - uses: actions/upload-artifact@v2
         with:
@@ -51,7 +54,12 @@ jobs:
       - name: Install Native Image
         run: ${{ env.JAVA_HOME }}\bin\gu.cmd install native-image
 
-      - name: Native Image for CLI
+      - name: Display infos
+        run: |
+          chmod +x mvnw
+          mvnw -v
+          
+      - name: Native Image
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x86_amd64
           mvnw.bat clean package -DskipTests -Dpackaging=native-image
