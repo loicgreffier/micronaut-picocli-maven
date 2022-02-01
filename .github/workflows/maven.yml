@@ -23,7 +23,7 @@ jobs:
       - name: Display infos
         run: |
           chmod +x mvnw
-          mvnw -v
+          ./mvnw -v
          
       - name: Build and analyze
         run: ./mvnw clean package -DskipTests -Dpackaging=native-image
